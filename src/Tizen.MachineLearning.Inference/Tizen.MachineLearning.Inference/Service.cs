@@ -26,7 +26,7 @@ namespace Tizen.MachineLearning.Inference
                     ret = Interop.Service.Create(name, out _handle);
                     break;
                 case InitType.Pipeline:
-                    /* TBU */
+                    ret = Interop.Service.LaunchPipeline(name, out _handle);
                     break;
                 default:
                     throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Invalid service type");
@@ -134,6 +134,59 @@ namespace Tizen.MachineLearning.Inference
             }
 
             _disposed = true;
+        }
+
+        static public void SetPipeline(string name, string desc)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            if (string.IsNullOrEmpty(desc))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property desc is invalid");
+
+            NNStreamerError ret = Interop.Service.SetPipeline(name, desc);
+            NNStreamer.CheckException(ret, "Failed to create service pipeline");
+        }
+
+        static public string GetPipeline(string name)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            string value;
+            NNStreamerError ret = Interop.Service.GetPipeline(name, out value);
+            NNStreamer.CheckException(ret, "Failed to get service pipeline");
+
+            return value;
+        }
+
+        static public void DeletePipeline(string name)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            NNStreamerError ret = Interop.Service.DeletePipeline(name);
+            NNStreamer.CheckException(ret, "Failed to delete service pipeline");
+        }
+
+        public PipelineState GetPipelineState()
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            int state = 0;
+            NNStreamerError ret = Interop.Service.GetPipelineState(_handle, out state);
+            if (ret == NNStreamerError.None && state == 0)
+                ret = NNStreamerError.InvalidOperation;
+
+            NNStreamer.CheckException(ret, "Failed to get service pipeline state");
+
+            return (PipelineState) state;
         }
     }
 }

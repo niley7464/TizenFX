@@ -354,5 +354,25 @@ internal static partial class Interop
         /* int ml_service_destroy (ml_service_h handle); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_destroy", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError Destroy(IntPtr handle);
+
+        /* int ml_service_pipeline_set (const char *name, const char *pipeline_desc); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_set", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError SetPipeline(string name, string desc);
+
+        /* int ml_service_pipeline_get (const char *name, char **pipeline_desc); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_get", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetPipeline(string name, out string desc);
+
+        /* int ml_service_pipeline_delete (const char *name); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_delete", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError DeletePipeline(string name);
+
+        /* int ml_service_pipeline_launch (const char *name, ml_service_h *handle); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_launch", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError LaunchPipeline(string name, out IntPtr handle);
+
+        /* int ml_service_pipeline_get_state (ml_service_h handle, ml_pipeline_state_e *state); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_get_state", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetPipelineState(IntPtr handle, out int state);
     }
 }
