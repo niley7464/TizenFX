@@ -188,6 +188,104 @@ namespace Tizen.MachineLearning.Inference
 
             return (PipelineState) state;
         }
+
+        static public int RegisterModel(string name, string path, bool activate = false, string description = "")
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            if (string.IsNullOrEmpty(path))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property path is invalid");
+
+            int version;
+            NNStreamerError ret = Interop.Service.RegisterModel(name, path, activate, description, out version);
+            NNStreamer.CheckException(ret, "Failed to register model");
+
+            return version;
+        }
+
+        static public void UpdateModelDescription(string name, int version, string description)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            if (string.IsNullOrEmpty(description))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property description is invalid");
+
+            NNStreamerError ret = Interop.Service.UpdateModelDescription(name, version, description);
+            NNStreamer.CheckException(ret, "Failed to update model description");
+        }
+
+        static public void ActivateModel(string name, int version, string description)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            NNStreamerError ret = Interop.Service.ActivateModel(name, version);
+            NNStreamer.CheckException(ret, "Failed to activate the given model");
+        }
+
+        static public MlInformation GetModel(string name, int version)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            IntPtr info = IntPtr.Zero;
+            NNStreamerError ret = Interop.Service.GetModel(name, version, out info);
+            NNStreamer.CheckException(ret, "Failed to get the given model");
+
+            MlInformation result = new MlInformation(info);
+            return result;
+        }
+
+        static public MlInformation GetActivatedModel(string name)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            IntPtr info = IntPtr.Zero;
+            NNStreamerError ret = Interop.Service.GetActivatedModel(name, out info);
+            NNStreamer.CheckException(ret, "Failed to get the given activated model");
+
+            MlInformation result = new MlInformation(info);
+            return result;
+        }
+
+        static public MlInformationList GetModels(string name)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            IntPtr info = IntPtr.Zero;
+            NNStreamerError ret = Interop.Service.GetAllModel(name, out info);
+            NNStreamer.CheckException(ret, "Failed to get the given models");
+
+            MlInformationList result = new MlInformationList(info);
+            return result;
+        }
+
+        static public void DeleteModel(string name, int version)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            NNStreamerError ret = Interop.Service.DeleteModel(name, version);
+            NNStreamer.CheckException(ret, "Failed to delete the given model");
+        }
     }
 
     public class MlInformation {
