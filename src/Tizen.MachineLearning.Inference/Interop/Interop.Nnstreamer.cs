@@ -25,6 +25,7 @@ internal static partial class Interop
         public const string Nnstreamer = "libcapi-nnstreamer.so.1";
         public const string MlCommon = "libcapi-ml-common.so.1";
         public const string MlSingle = "libcapi-ml-inference-single.so.1";
+        public const string MlService = "libcapi-ml-service.so.1";
     }
 
     internal static partial class Pipeline
@@ -306,5 +307,52 @@ internal static partial class Interop
         {
             return (val != IntPtr.Zero) ? Marshal.PtrToStringAnsi(val) : string.Empty;
         }
+    }
+
+    internal static partial class Service
+    {
+        /* typedef void (*ml_service_event_cb) (ml_service_event_e event, ml_information_h event_data, void *user_data); */
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void ServiceEventCallback(ServiceEventType event_type, IntPtr event_data, IntPtr user_data);
+
+        /* int ml_service_new (const char *config, ml_service_h *handle); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_new", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Create(string config, out IntPtr handle);
+
+        /* int ml_service_set_event_cb (ml_service_h handle, ml_service_event_cb cb, void *user_data); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_set_event_cb", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError SetEventCb(IntPtr handle, ServiceEventCallback cb, IntPtr userData);
+
+        /* int ml_service_start (ml_service_h handle); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_start", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Start(IntPtr handle);
+
+        /* int ml_service_stop (ml_service_h handle); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_stop", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Stop(IntPtr handle);
+
+        /* int ml_service_get_input_information (ml_service_h handle, const char *name, ml_tensors_info_h *info); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_get_input_information", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetInputInformation(IntPtr handle, string name, out IntPtr info);
+
+        /* int ml_service_get_output_information (ml_service_h handle, const char *name, ml_tensors_info_h *info); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_get_output_information", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetOutputInformation(IntPtr handle, string name, out IntPtr info);
+
+        /* int ml_service_set_information (ml_service_h handle, const char *name, const char *value); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_set_information", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError SetInformation(IntPtr handle, string name, string value);
+
+        /* int ml_service_get_information (ml_service_h handle, const char *name, char **value); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_get_information", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetInformation(IntPtr handle, string name, out string value);
+
+        /* int ml_service_request (ml_service_h handle, const char *name, const ml_tensors_data_h data); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_request", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Request(IntPtr handle, string name, IntPtr data);
+
+        /* int ml_service_destroy (ml_service_h handle); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_destroy", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError Destroy(IntPtr handle);
     }
 }
