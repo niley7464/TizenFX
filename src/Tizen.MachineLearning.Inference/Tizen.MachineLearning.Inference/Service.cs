@@ -7,6 +7,9 @@ namespace Tizen.MachineLearning.Inference
         private IntPtr _handle = IntPtr.Zero;
         private bool _disposed = false;
 
+        private event EventHandler<ServiceReceivedEventArgs> _serviceEventReceived;
+        private Interop.Service.ServiceEventCallback _serviceEventCallback;
+
         public enum InitType
         {
             Config = 0,
@@ -33,6 +36,15 @@ namespace Tizen.MachineLearning.Inference
             }
 
             NNStreamer.CheckException(ret, "Failed to create ml_service instance");
+
+            _serviceEventCallback = (type, event_data_handle, data_handle) =>
+            {
+                if (type == ServiceEventType.NewData && _serviceEventReceived!= null) {
+                    MlInformation info = new MlInformation(event_data_handle);
+                    TensorsData data = TensorsData.CreateFromNativeHandle(data_handle, IntPtr.Zero, true, false);
+                    _serviceEventReceived?.Invoke(this, new ServiceReceivedEventArgs(info, data));
+                }
+            };
         }
 
         ~Service()
