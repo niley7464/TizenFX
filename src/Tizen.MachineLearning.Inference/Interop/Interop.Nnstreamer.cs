@@ -422,5 +422,17 @@ internal static partial class Interop
         /* int ml_service_model_delete (const char *name, const unsigned int version); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_delete", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError DeleteModel(string name, int version);
+
+        /* int ml_service_resource_add (const char *name, const char *path, const char *description);*/
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_resource_add", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError AddResource(string name, string path, string description);
+
+        /* int ml_service_resource_delete (const char *name); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_resource_delete", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError DeleteResource(string name);
+
+        /* int ml_service_resource_get (const char *name, ml_information_list_h *res); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_resource_get", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetResource(string name, out IntPtr res);
     }
 }
