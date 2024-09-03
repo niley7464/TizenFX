@@ -394,5 +394,33 @@ internal static partial class Interop
         /* int ml_service_pipeline_get_state (ml_service_h handle, ml_pipeline_state_e *state); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_get_state", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError GetPipelineState(IntPtr handle, out int state);
+
+        /* int ml_service_model_register (const char *name, const char *path, const bool activate, const char *description, unsigned int *version); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_register", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError RegisterModel(string name, string path, bool activate, string description, out int version);
+
+        /* int ml_service_model_update_description (const char *name, const unsigned int version, const char *description); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_update_description", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError UpdateModelDescription(string name, int version, string description);
+
+        /* int ml_service_model_activate (const char *name, const unsigned int version); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_activate", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError ActivateModel(string name, int version);
+
+        /* int ml_service_model_get (const char *name, const unsigned int version, ml_information_h *info); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_get", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetModel(string name, int version, out IntPtr info);
+
+        /* int ml_service_model_get_activated (const char *name, ml_information_h *info); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_get_activated", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetActivatedModel(string name, out IntPtr info);
+
+        /* int ml_service_model_get_all (const char *name, ml_information_list_h *info_list); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_get_all", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetAllModel(string name, out IntPtr info_list);
+
+        /* int ml_service_model_delete (const char *name, const unsigned int version); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_delete", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError DeleteModel(string name, int version);
     }
 }
