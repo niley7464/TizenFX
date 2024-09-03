@@ -286,6 +286,45 @@ namespace Tizen.MachineLearning.Inference
             NNStreamerError ret = Interop.Service.DeleteModel(name, version);
             NNStreamer.CheckException(ret, "Failed to delete the given model");
         }
+
+        static public void AddResource(string name, string path, string description="")
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            if (string.IsNullOrEmpty(path))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property path is invalid");
+
+            NNStreamerError ret = Interop.Service.AddResource(name, path, description);
+            NNStreamer.CheckException(ret, "Failed to add resource");
+        }
+
+        static public void DeleteResource(string name)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            NNStreamerError ret = Interop.Service.DeleteResource(name);
+            NNStreamer.CheckException(ret, "Failed to delete resource");
+        }
+
+        static public MlInformationList GetResource(string name)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (string.IsNullOrEmpty(name))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
+
+            IntPtr infoList = IntPtr.Zero;
+            NNStreamerError ret = Interop.Service.GetResource(name, out infoList);
+            NNStreamer.CheckException(ret, "Failed to get resource");
+
+            return new MlInformationList(infoList);
+        }
     }
 
     public class MlInformation {
