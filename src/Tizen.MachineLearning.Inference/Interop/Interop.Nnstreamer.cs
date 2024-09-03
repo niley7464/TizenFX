@@ -307,6 +307,26 @@ internal static partial class Interop
         {
             return (val != IntPtr.Zero) ? Marshal.PtrToStringAnsi(val) : string.Empty;
         }
+
+        /* int ml_information_destroy (ml_information_h ml_info); */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_information_destroy", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError DestroyInformation(IntPtr info);
+
+        /* int ml_information_get (ml_information_h ml_info, const char *key, void **value); */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_information_get", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetValue(IntPtr info, string key, out IntPtr value);
+
+        /* int ml_information_list_destroy (ml_information_list_h ml_info_list); */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_information_list_destroy", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError DestroyInformationList(IntPtr info_list);
+
+        /* int ml_information_list_length (ml_information_list_h ml_info_list, unsigned int *length); */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_information_list_length", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetInformationListLength(IntPtr info_list, out int length);
+
+        /* int ml_information_list_get (ml_information_list_h ml_info_list, unsigned int index, ml_information_h *ml_info); */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_information_list_get", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError GetInformation(IntPtr info_list, int index, out IntPtr info);
     }
 
     internal static partial class Service
