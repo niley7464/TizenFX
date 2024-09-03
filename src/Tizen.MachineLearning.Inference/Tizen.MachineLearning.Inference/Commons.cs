@@ -262,6 +262,12 @@ namespace Tizen.MachineLearning.Inference
         NPUSR = 0x13000,
     }
 
+    public enum ServiceEventType
+    {
+        Unknown = 0,
+        NewData = 1,
+    }
+
     internal static class Tensor
     {
         /// <summary>
