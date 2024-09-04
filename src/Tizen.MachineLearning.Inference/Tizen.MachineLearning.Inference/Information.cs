@@ -37,7 +37,10 @@ namespace Tizen.MachineLearning.Inference
 
         public string GetInformation(string key)
         {
-            IntPtr value;
+            if (string.IsNullOrEmpty(key))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property key is invalid");
+
+            IntPtr value = IntPtr.Zero;
 
             NNStreamerError ret = Interop.Util.GetValue(_handle, key, out value);
             NNStreamer.CheckException(ret, "Failed to get information value from key");

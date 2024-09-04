@@ -34,7 +34,12 @@ namespace Tizen.MachineLearning.Inference
 
         public MlInformation GetInformation(int index)
         {
-            IntPtr value;
+            int length = GetLength();
+
+            if (index >= length)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property index is out of bound");
+
+            IntPtr value = IntPtr.Zero;
 
             NNStreamerError ret = Interop.Util.GetInformation(_handle, index, out value);
             NNStreamer.CheckException(ret, "Failed to get information from list");
