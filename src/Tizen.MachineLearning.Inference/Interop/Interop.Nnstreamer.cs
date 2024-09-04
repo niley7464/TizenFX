@@ -333,7 +333,7 @@ internal static partial class Interop
     {
         /* typedef void (*ml_service_event_cb) (ml_service_event_e event, ml_information_h event_data, void *user_data); */
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void ServiceEventCallback(ServiceEventType event_type, IntPtr event_data, IntPtr user_data);
+        internal delegate void ServiceEventCallback(Tizen.MachineLearning.Inference.Service.EventType event_type, IntPtr event_data, IntPtr user_data);
 
         /* int ml_service_new (const char *config, ml_service_h *handle); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_new", CallingConvention = CallingConvention.Cdecl)]

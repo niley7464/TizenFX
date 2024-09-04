@@ -16,6 +16,11 @@ namespace Tizen.MachineLearning.Inference
             Pipeline = 1,
         }
 
+        public enum EventType
+        {
+            NewData = 1,
+        }
+
         public Service(string name, InitType type)
         {
             NNStreamer.CheckNNStreamerSupport();
@@ -39,7 +44,7 @@ namespace Tizen.MachineLearning.Inference
 
             _serviceEventCallback = (type, event_data_handle, data_handle) =>
             {
-                if (type == ServiceEventType.NewData && _serviceEventReceived!= null) {
+                if (type == EventType.NewData && _serviceEventReceived!= null) {
                     MlInformation info = new MlInformation(event_data_handle);
                     TensorsData data = TensorsData.CreateFromNativeHandle(data_handle, IntPtr.Zero, true, false);
                     _serviceEventReceived?.Invoke(this, new ServiceReceivedEventArgs(info, data));
