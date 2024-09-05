@@ -127,11 +127,11 @@ namespace Tizen.MachineLearning.Inference
             if (string.IsNullOrEmpty(name))
                 throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
 
-            string value;
+            IntPtr value = IntPtr.Zero;
             NNStreamerError ret = Interop.Service.GetInformation(_handle, name, out value);
             NNStreamer.CheckException(ret, "Failed to get service information");
 
-            return value;
+            return Interop.Util.IntPtrToString(value);
         }
 
         public void Request(string name, TensorsData data)
@@ -198,11 +198,11 @@ namespace Tizen.MachineLearning.Inference
                 if (string.IsNullOrEmpty(name))
                     throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property name is invalid");
 
-                string value;
+                IntPtr value = IntPtr.Zero;
                 NNStreamerError ret = Interop.Service.GetPipeline(name, out value);
                 NNStreamer.CheckException(ret, "Failed to get service pipeline");
 
-                return value;
+                return Interop.Util.IntPtrToString(value);
             }
 
             static public void Delete(string name)

@@ -365,7 +365,7 @@ internal static partial class Interop
 
         /* int ml_service_get_information (ml_service_h handle, const char *name, char **value); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_get_information", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern NNStreamerError GetInformation(IntPtr handle, string name, out string value);
+        internal static extern NNStreamerError GetInformation(IntPtr handle, string name, out IntPtr value);
 
         /* int ml_service_request (ml_service_h handle, const char *name, const ml_tensors_data_h data); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_request", CallingConvention = CallingConvention.Cdecl)]
@@ -381,7 +381,7 @@ internal static partial class Interop
 
         /* int ml_service_pipeline_get (const char *name, char **pipeline_desc); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_get", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern NNStreamerError GetPipeline(string name, out string desc);
+        internal static extern NNStreamerError GetPipeline(string name, out IntPtr desc);
 
         /* int ml_service_pipeline_delete (const char *name); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_delete", CallingConvention = CallingConvention.Cdecl)]
