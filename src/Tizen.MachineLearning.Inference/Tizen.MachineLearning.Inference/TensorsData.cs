@@ -220,7 +220,7 @@ namespace Tizen.MachineLearning.Inference
             _disposed = true;
         }
 
-        internal IntPtr GetHandle()
+        public IntPtr GetHandle()
         {
             return _handle;
         }
@@ -238,7 +238,7 @@ namespace Tizen.MachineLearning.Inference
             }
         }
 
-        internal static TensorsData CreateFromNativeHandle(IntPtr dataHandle, IntPtr infoHandle, bool isFetch = false, bool hasOwnership = true)
+        public static TensorsData CreateFromNativeHandle(IntPtr dataHandle, IntPtr infoHandle, bool isFetch = false, bool hasOwnership = true)
         {
             TensorsInfo info = null;
 
