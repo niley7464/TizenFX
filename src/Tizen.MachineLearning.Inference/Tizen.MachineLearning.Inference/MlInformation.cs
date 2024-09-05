@@ -29,7 +29,7 @@ namespace Tizen.MachineLearning.Inference
             Information = 1,
         }
 
-        MlInformation() {
+        public MlInformation() {
             NNStreamer.CheckNNStreamerSupport();
 
             NNStreamerError ret = Interop.Util.CreateOption(out _handle);
