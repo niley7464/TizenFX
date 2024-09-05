@@ -22,7 +22,7 @@ namespace Tizen.MachineLearning.Inference
     {
         private IntPtr _handle = IntPtr.Zero;
 
-        internal MlInformationList(IntPtr handle) {
+        public MlInformationList(IntPtr handle) {
             NNStreamer.CheckNNStreamerSupport();
             _handle = handle;
         }

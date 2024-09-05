@@ -15,8 +15,9 @@
  */
 
 using System;
+using Tizen.MachineLearning.Inference;
 
-namespace Tizen.MachineLearning.Inference
+namespace Tizen.MachineLearning.Service
 {
     public class ServiceReceivedEventArgs : EventArgs
     {

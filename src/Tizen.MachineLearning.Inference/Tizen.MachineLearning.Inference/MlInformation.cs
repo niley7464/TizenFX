@@ -38,7 +38,7 @@ namespace Tizen.MachineLearning.Inference
             _type = InfoType.Option;
         }
 
-        internal MlInformation(IntPtr handle) {
+        public MlInformation(IntPtr handle) {
             NNStreamer.CheckNNStreamerSupport();
             if (handle == IntPtr.Zero)
                 throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The information handle is null");
