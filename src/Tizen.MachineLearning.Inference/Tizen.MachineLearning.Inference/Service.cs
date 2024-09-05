@@ -78,6 +78,26 @@ namespace Tizen.MachineLearning.Inference
             return _handle;
         }
 
+        public event EventHandler<ServiceReceivedEventArgs> ServiceEventReceived
+        {
+            add
+            {
+                if (value == null)
+                    return;
+
+                NNStreamerError ret = Interop.Service.SetEventCb(_handle, _serviceEventCallback, IntPtr.Zero);
+                NNStreamer.CheckException(ret, "Failed to register event callback");
+                _serviceEventReceived += value;
+            }
+
+            remove
+            {
+                if (value == null)
+                    return;
+
+                _serviceEventReceived -= value;
+            }
+        }
 
         public void Start()
         {
