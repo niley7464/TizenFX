@@ -23,7 +23,7 @@ namespace Tizen.MachineLearning.Inference
         private IntPtr _handle = IntPtr.Zero;
         private InfoType _type;
 
-        public enum InfoType
+        private enum InfoType
         {
             Option = 0,
             Information = 1,
@@ -68,11 +68,6 @@ namespace Tizen.MachineLearning.Inference
         internal IntPtr GetHandle()
         {
             return _handle;
-        }
-
-        public InfoType GetType()
-        {
-            return _type;
         }
 
         public void SetInformation(string key, string value)
