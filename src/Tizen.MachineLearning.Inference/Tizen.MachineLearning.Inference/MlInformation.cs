@@ -65,6 +65,11 @@ namespace Tizen.MachineLearning.Inference
             NNStreamer.CheckException(ret, "Failed to destroy the information");
         }
 
+        internal IntPtr GetHandle()
+        {
+            return _handle;
+        }
+
         public InfoType GetType()
         {
             return _type;

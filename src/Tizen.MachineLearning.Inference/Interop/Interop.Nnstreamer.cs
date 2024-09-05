@@ -420,6 +420,14 @@ internal static partial class Interop
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_pipeline_get_state", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError GetPipelineState(IntPtr handle, out int state);
 
+        /* int ml_service_query_create (ml_option_h option, ml_service_h *handle); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_query_create", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError CreateQuery(IntPtr option, out IntPtr handle);
+
+        /* int ml_service_query_request (ml_service_h handle, const ml_tensors_data_h input, ml_tensors_data_h *output); */
+        [DllImport(Libraries.MlService, EntryPoint = "ml_service_query_request", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError RequestQuery(IntPtr handle, IntPtr input, out IntPtr output);
+
         /* int ml_service_model_register (const char *name, const char *path, const bool activate, const char *description, unsigned int *version); */
         [DllImport(Libraries.MlService, EntryPoint = "ml_service_model_register", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError RegisterModel(string name, string path, bool activate, string description, out int version);

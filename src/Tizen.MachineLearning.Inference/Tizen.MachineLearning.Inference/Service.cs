@@ -57,15 +57,19 @@ namespace Tizen.MachineLearning.Inference
             }
 
             NNStreamer.CheckException(ret, "Failed to create ml_service instance");
+            SetEventCb();
+        }
 
-            _serviceEventCallback = (type, event_data_handle, data_handle) =>
-            {
-                if (type == EventType.NewData && _serviceEventReceived!= null) {
-                    MlInformation info = new MlInformation(event_data_handle);
-                    TensorsData data = TensorsData.CreateFromNativeHandle(data_handle, IntPtr.Zero, true, false);
-                    _serviceEventReceived?.Invoke(this, new ServiceReceivedEventArgs(info, data));
-                }
-            };
+        public Service(MlInformation information)
+        {
+            NNStreamer.CheckNNStreamerSupport();
+
+            if (information == null)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The information is invalid");
+
+            NNStreamerError ret = Interop.Service.CreateQuery(information.GetHandle(), out _handle);
+            NNStreamer.CheckException(ret, "Failed to create ml_service instance");
+            SetEventCb();
         }
 
         ~Service()
@@ -97,6 +101,18 @@ namespace Tizen.MachineLearning.Inference
 
                 _serviceEventReceived -= value;
             }
+        }
+
+        private void SetEventCb()
+        {
+            _serviceEventCallback = (type, event_data_handle, data_handle) =>
+            {
+                if (type == EventType.NewData && _serviceEventReceived!= null) {
+                    MlInformation info = new MlInformation(event_data_handle);
+                    TensorsData data = TensorsData.CreateFromNativeHandle(data_handle, IntPtr.Zero, true, false);
+                    _serviceEventReceived?.Invoke(this, new ServiceReceivedEventArgs(info, data));
+                }
+            };
         }
 
         public void Start()
@@ -164,6 +180,18 @@ namespace Tizen.MachineLearning.Inference
 
             NNStreamerError ret = Interop.Service.Request(_handle, name, data.GetHandle());
             NNStreamer.CheckException(ret, "Failed to request service");
+        }
+
+        public TensorsData RequestQuery(TensorsData input)
+        {
+            if (input == null)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Given input is invalid");
+
+            IntPtr outputPtr = IntPtr.Zero;
+            NNStreamerError ret = Interop.Service.RequestQuery(_handle, input.GetHandle(), out outputPtr);
+            NNStreamer.CheckException(ret, "Failed to request query");
+
+            return TensorsData.CreateFromNativeHandle(outputPtr, IntPtr.Zero, true);
         }
 
         public void Dispose()
