@@ -26,50 +26,41 @@ namespace Tizen.MachineLearning.Inference
         private event EventHandler<ServiceReceivedEventArgs> _serviceEventReceived;
         private Interop.Service.ServiceEventCallback _serviceEventCallback;
 
-        public enum InitType
-        {
-            Config = 0,
-            Pipeline = 1,
-        }
-
         public enum EventType
         {
             NewData = 1,
         }
 
-        public Service(string name, InitType type)
+        public static Service Create(string config)
         {
             NNStreamer.CheckNNStreamerSupport();
-            NNStreamerError ret = NNStreamerError.None;
 
-            if (string.IsNullOrEmpty(name))
-                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The service configuration path or pipeline name is invalid");
+            if (string.IsNullOrEmpty(config))
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The service configuration path is invalid");
 
-            switch (type) {
-                case InitType.Config:
-                    ret = Interop.Service.Create(name, out _handle);
-                    break;
-                case InitType.Pipeline:
-                    ret = Interop.Service.LaunchPipeline(name, out _handle);
-                    break;
-                default:
-                    throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Invalid service type");
-            }
+            IntPtr handle = IntPtr.Zero;
+            NNStreamerError ret = Interop.Service.Create(config, out handle);
 
-            NNStreamer.CheckException(ret, "Failed to create ml_service instance");
-            SetEventCb();
+            NNStreamer.CheckException(ret, "Failed to create service config instance");
+
+            return new Service(handle);
         }
 
-        public Service(MlInformation information)
+        internal Service(IntPtr handle)
         {
-            NNStreamer.CheckNNStreamerSupport();
+            if (handle == IntPtr.Zero)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The service handle is null");
 
-            if (information == null)
-                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The information is invalid");
+            _handle = handle;
 
-            NNStreamerError ret = Interop.Service.CreateQuery(information.GetHandle(), out _handle);
-            NNStreamer.CheckException(ret, "Failed to create ml_service instance");
-            SetEventCb();
+            _serviceEventCallback = (type, event_data_handle, data_handle) =>
+            {
+                if (type == EventType.NewData && _serviceEventReceived!= null) {
+                    MlInformation info = new MlInformation(event_data_handle);
+                    TensorsData data = TensorsData.CreateFromNativeHandle(data_handle, IntPtr.Zero, true, false);
+                    _serviceEventReceived?.Invoke(this, new ServiceReceivedEventArgs(info, data));
+                }
+            };
         }
 
         ~Service()
@@ -101,18 +92,6 @@ namespace Tizen.MachineLearning.Inference
 
                 _serviceEventReceived -= value;
             }
-        }
-
-        private void SetEventCb()
-        {
-            _serviceEventCallback = (type, event_data_handle, data_handle) =>
-            {
-                if (type == EventType.NewData && _serviceEventReceived!= null) {
-                    MlInformation info = new MlInformation(event_data_handle);
-                    TensorsData data = TensorsData.CreateFromNativeHandle(data_handle, IntPtr.Zero, true, false);
-                    _serviceEventReceived?.Invoke(this, new ServiceReceivedEventArgs(info, data));
-                }
-            };
         }
 
         public void Start()
@@ -182,18 +161,6 @@ namespace Tizen.MachineLearning.Inference
             NNStreamer.CheckException(ret, "Failed to request service");
         }
 
-        public TensorsData RequestQuery(TensorsData input)
-        {
-            if (input == null)
-                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Given input is invalid");
-
-            IntPtr outputPtr = IntPtr.Zero;
-            NNStreamerError ret = Interop.Service.RequestQuery(_handle, input.GetHandle(), out outputPtr);
-            NNStreamer.CheckException(ret, "Failed to request query");
-
-            return TensorsData.CreateFromNativeHandle(outputPtr, IntPtr.Zero, true);
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -223,8 +190,61 @@ namespace Tizen.MachineLearning.Inference
             _disposed = true;
         }
 
+        public class Query
+        {
+            private Service _service;
+
+            public Query(MlInformation information)
+            {
+                NNStreamer.CheckNNStreamerSupport();
+                if (information == null)
+                    throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The information is invalid");
+                IntPtr handle = IntPtr.Zero;
+                NNStreamerError ret = Interop.Service.CreateQuery(information.GetHandle(), out handle);
+                NNStreamer.CheckException(ret, "Failed to create service query instance");
+
+                _service = new Service(handle);
+            }
+
+            public TensorsData Request(TensorsData input)
+            {
+                if (input == null)
+                    throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "Given input is invalid");
+
+                IntPtr outputPtr = IntPtr.Zero;
+                NNStreamerError ret = Interop.Service.RequestQuery(_service.GetHandle(), input.GetHandle(), out outputPtr);
+                NNStreamer.CheckException(ret, "Failed to request query");
+
+                return TensorsData.CreateFromNativeHandle(outputPtr, IntPtr.Zero, true);
+            }
+        }
+
         public class Pipeline
         {
+            private Service _service;
+
+            public Pipeline(string name)
+            {
+                NNStreamer.CheckNNStreamerSupport();
+                IntPtr handle = IntPtr.Zero;
+                NNStreamerError ret = Interop.Service.LaunchPipeline(name, out handle);
+                NNStreamer.CheckException(ret, "Failed to create service pipeline instance");
+
+                _service = new Service(handle);
+            }
+
+            public void Start()
+            {
+                if (_service != null)
+                    _service.Start();
+            }
+
+            public void Stop()
+            {
+                if (_service != null)
+                    _service.Stop();
+            }
+
             static public void Set(string name, string desc)
             {
                 NNStreamer.CheckNNStreamerSupport();
@@ -264,12 +284,12 @@ namespace Tizen.MachineLearning.Inference
                 NNStreamer.CheckException(ret, "Failed to delete service pipeline");
             }
 
-            static public PipelineState GetState(Service service)
+            public PipelineState GetState()
             {
                 NNStreamer.CheckNNStreamerSupport();
 
                 int state = 0;
-                NNStreamerError ret = Interop.Service.GetPipelineState(service.GetHandle(), out state);
+                NNStreamerError ret = Interop.Service.GetPipelineState(_service.GetHandle(), out state);
                 if (ret == NNStreamerError.None && state == 0)
                     ret = NNStreamerError.InvalidOperation;
 
