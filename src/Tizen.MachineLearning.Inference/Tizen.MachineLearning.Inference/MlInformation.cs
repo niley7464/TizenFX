@@ -48,7 +48,7 @@ namespace Tizen.MachineLearning.Inference
         }
 
         ~MlInformation() {
-            NNStreamerError ret = NNStreamerError.None;
+            NNStreamerError ret = NNStreamerError.InvalidParameter;
             if (_handle != IntPtr.Zero)
             {
                 switch(_type)
@@ -83,7 +83,7 @@ namespace Tizen.MachineLearning.Inference
             if (string.IsNullOrEmpty(value))
                 throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property value is invalid");
 
-            NNStreamerError ret = NNStreamerError.None;
+            NNStreamerError ret = NNStreamerError.InvalidParameter;
             switch(_type)
             {
                 case InfoType.Option:
@@ -105,7 +105,7 @@ namespace Tizen.MachineLearning.Inference
                 throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property key is invalid");
 
             IntPtr value = IntPtr.Zero;
-            NNStreamerError ret = NNStreamerError.None;
+            NNStreamerError ret = NNStreamerError.InvalidParameter;
 
             switch(_type)
             {
