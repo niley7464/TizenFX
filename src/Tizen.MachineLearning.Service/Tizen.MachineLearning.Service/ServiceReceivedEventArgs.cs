@@ -21,13 +21,11 @@ namespace Tizen.MachineLearning.Service
 {
     public class ServiceReceivedEventArgs : EventArgs
     {
-        internal ServiceReceivedEventArgs(MlInformation info, TensorsData data)
+        internal ServiceReceivedEventArgs(MlInformation info)
         {
             Info = info;
-            Data = data;
         }
 
         public MlInformation Info { get; }
-        public TensorsData Data { get; }
     }
 }

@@ -54,12 +54,11 @@ namespace Tizen.MachineLearning.Service
 
             _handle = handle;
 
-            _serviceEventCallback = (type, event_data_handle, data_handle) =>
+            _serviceEventCallback = (type, event_data_handle, _) =>
             {
                 if (type == EventType.NewData && _serviceEventReceived!= null) {
                     MlInformation info = new MlInformation(event_data_handle);
-                    TensorsData data = TensorsData.CreateFromNativeHandle(data_handle, IntPtr.Zero, true, false);
-                    _serviceEventReceived?.Invoke(this, new ServiceReceivedEventArgs(info, data));
+                    _serviceEventReceived?.Invoke(this, new ServiceReceivedEventArgs(info));
                 }
             };
         }
