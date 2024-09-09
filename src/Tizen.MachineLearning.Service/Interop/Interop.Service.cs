@@ -24,6 +24,7 @@ internal static partial class Interop
     internal static partial class Libraries
     {
         public const string MlService = "libcapi-ml-service.so.1";
+        public const string MlCommon = "libcapi-ml-common.so.1";
     }
 
     internal static partial class Service
@@ -147,5 +148,21 @@ internal static partial class Interop
         {
             return (val != IntPtr.Zero) ? Marshal.PtrToStringAnsi(val) : string.Empty;
         }
+
+        /* int ml_tensors_info_get_count (ml_tensors_info_h info, unsigned int *count) */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_tensors_info_get_count", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern MLServiceError GetTensorsCount(IntPtr info, out int count);
+
+        /* int ml_tensors_info_get_tensor_name (ml_tensors_info_h info, unsigned int index, char **name) */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_tensors_info_get_tensor_name", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern MLServiceError GetTensorName(IntPtr info, int index, out string name);
+
+        /* int ml_tensors_info_get_tensor_type (ml_tensors_info_h info, unsigned int index, ml_tensor_type_e *type) */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_tensors_info_get_tensor_type", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern MLServiceError GetTensorType(IntPtr info, int index, out TensorType type);
+
+        /* int ml_tensors_info_get_tensor_dimension (ml_tensors_info_h info, unsigned int index, ml_tensor_dimension dimension) */
+        [DllImport(Libraries.MlCommon, EntryPoint = "ml_tensors_info_get_tensor_dimension", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern MLServiceError GetTensorDimension(IntPtr info, int index, [In, Out] uint[] dimension);
     }
 }

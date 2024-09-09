@@ -121,7 +121,7 @@ namespace Tizen.MachineLearning.Service
 
             MLService.CheckException(ret, "Failed to get TensorsInfo handle");
 
-            TensorsInfo retInfo = TensorsInfo.ConvertTensorsInfoFromHandle(inHandle);
+            TensorsInfo retInfo = ConvertTensorsInfoFromHandle(inHandle);
             return retInfo;
         }
 
@@ -188,6 +188,38 @@ namespace Tizen.MachineLearning.Service
             }
 
             _disposed = true;
+        }
+
+        internal static TensorsInfo ConvertTensorsInfoFromHandle(IntPtr handle)
+        {
+            TensorsInfo retInfo = null;
+            MLServiceError ret = MLServiceError.None;
+
+            int rankLimit = 16;
+            int count;
+            ret = Interop.Util.GetTensorsCount(handle, out count);
+            MLService.CheckException(ret, "Fail to get Tensors' count");
+
+            retInfo = new TensorsInfo();
+
+            for (int i = 0; i < count; ++i)
+            {
+                string name;
+                TensorType type;
+                uint[] dim = new uint[rankLimit];
+
+                ret = Interop.Util.GetTensorName(handle, i, out name);
+                MLService.CheckException(ret, "Fail to get Tensor's name");
+
+                ret = Interop.Util.GetTensorType(handle, i, out type);
+                MLService.CheckException(ret, "Fail to get Tensor's type");
+
+                ret = Interop.Util.GetTensorDimension(handle, i, dim);
+                MLService.CheckException(ret, "Fail to get Tensor's dimension");
+
+                retInfo.AddTensorInfo(name, type, (int[])(object)dim);
+            }
+            return retInfo;
         }
 
         public class Query
