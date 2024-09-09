@@ -34,15 +34,15 @@ namespace Tizen.MachineLearning.Service
 
         public static Service Create(string config)
         {
-            NNService.CheckNNServiceSupport();
+            MLService.CheckMLServiceSupport();
 
             if (string.IsNullOrEmpty(config))
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The service configuration path is invalid");
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The service configuration path is invalid");
 
             IntPtr handle = IntPtr.Zero;
-            NNServiceError ret = Interop.Service.Create(config, out handle);
+            MLServiceError ret = Interop.Service.Create(config, out handle);
 
-            NNService.CheckException(ret, "Failed to create service config instance");
+            MLService.CheckException(ret, "Failed to create service config instance");
 
             return new Service(handle);
         }
@@ -50,7 +50,7 @@ namespace Tizen.MachineLearning.Service
         internal Service(IntPtr handle)
         {
             if (handle == IntPtr.Zero)
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The service handle is null");
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The service handle is null");
 
             _handle = handle;
 
@@ -80,8 +80,8 @@ namespace Tizen.MachineLearning.Service
                 if (value == null)
                     return;
 
-                NNServiceError ret = Interop.Service.SetEventCb(_handle, _serviceEventCallback, IntPtr.Zero);
-                NNService.CheckException(ret, "Failed to register event callback");
+                MLServiceError ret = Interop.Service.SetEventCb(_handle, _serviceEventCallback, IntPtr.Zero);
+                MLService.CheckException(ret, "Failed to register event callback");
                 _serviceEventReceived += value;
             }
 
@@ -96,30 +96,30 @@ namespace Tizen.MachineLearning.Service
 
         public void Start()
         {
-            NNServiceError ret = Interop.Service.Start(_handle);
-            NNService.CheckException(ret, "Failed to start the service because of internal error");
+            MLServiceError ret = Interop.Service.Start(_handle);
+            MLService.CheckException(ret, "Failed to start the service because of internal error");
         }
 
         public void Stop()
         {
-            NNServiceError ret = Interop.Service.Stop(_handle);
-            NNService.CheckException(ret, "Failed to stop the service because of internal error");
+            MLServiceError ret = Interop.Service.Stop(_handle);
+            MLService.CheckException(ret, "Failed to stop the service because of internal error");
         }
 
         public TensorsInfo GetTensorsInformation(string name, bool is_input)
         {
             if (string.IsNullOrEmpty(name))
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
             IntPtr inHandle;
-            NNServiceError ret;
+            MLServiceError ret;
 
             if (is_input)
                 ret = Interop.Service.GetInputInformation(_handle, name, out inHandle);
             else
                 ret = Interop.Service.GetOutputInformation(_handle, name, out inHandle);
 
-            NNService.CheckException(ret, "Failed to get TensorsInfo handle");
+            MLService.CheckException(ret, "Failed to get TensorsInfo handle");
 
             TensorsInfo retInfo = TensorsInfo.ConvertTensorsInfoFromHandle(inHandle);
             return retInfo;
@@ -128,23 +128,23 @@ namespace Tizen.MachineLearning.Service
         public void SetInformation(string name, string value)
         {
             if (string.IsNullOrEmpty(name))
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
             if (string.IsNullOrEmpty(value))
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property value is invalid");
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property value is invalid");
 
-            NNServiceError ret = Interop.Service.SetInformation(_handle, name, value);
-            NNService.CheckException(ret, "Failed to set service information");
+            MLServiceError ret = Interop.Service.SetInformation(_handle, name, value);
+            MLService.CheckException(ret, "Failed to set service information");
         }
 
         public string GetInformation(string name)
         {
             if (string.IsNullOrEmpty(name))
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
             IntPtr value = IntPtr.Zero;
-            NNServiceError ret = Interop.Service.GetInformation(_handle, name, out value);
-            NNService.CheckException(ret, "Failed to get service information");
+            MLServiceError ret = Interop.Service.GetInformation(_handle, name, out value);
+            MLService.CheckException(ret, "Failed to get service information");
 
             return Interop.Util.IntPtrToString(value);
         }
@@ -152,13 +152,13 @@ namespace Tizen.MachineLearning.Service
         public void Request(string name, TensorsData data)
         {
             if (string.IsNullOrEmpty(name))
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
             if (data == null)
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "Given data is invalid");
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "Given data is invalid");
 
-            NNServiceError ret = Interop.Service.Request(_handle, name, data.GetHandle());
-            NNService.CheckException(ret, "Failed to request service");
+            MLServiceError ret = Interop.Service.Request(_handle, name, data.GetHandle());
+            MLService.CheckException(ret, "Failed to request service");
         }
 
         public void Dispose()
@@ -180,9 +180,9 @@ namespace Tizen.MachineLearning.Service
             // release unmanaged objects
             if (_handle != IntPtr.Zero)
             {
-                NNServiceError ret = Interop.Service.Destroy(_handle);
-                if (ret != NNServiceError.None)
-                    Log.Error(NNService.TAG, "Failed to destroy the service handle");
+                MLServiceError ret = Interop.Service.Destroy(_handle);
+                if (ret != MLServiceError.None)
+                    Log.Error(MLService.TAG, "Failed to destroy the service handle");
 
                 _handle = IntPtr.Zero;
             }
@@ -196,17 +196,17 @@ namespace Tizen.MachineLearning.Service
 
             public Query(MlInformationList infoList, int index)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
                 if (infoList == null)
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The information list is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The information list is invalid");
 
                 IntPtr infoHandle = infoList.GetInformationHandle(index);
                 if (infoHandle == null)
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The information handle is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The information handle is invalid");
 
                 IntPtr handle = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.CreateQuery(infoHandle, out handle);
-                NNService.CheckException(ret, "Failed to create service query instance");
+                MLServiceError ret = Interop.Service.CreateQuery(infoHandle, out handle);
+                MLService.CheckException(ret, "Failed to create service query instance");
 
                 _service = new Service(handle);
             }
@@ -214,11 +214,11 @@ namespace Tizen.MachineLearning.Service
             public TensorsData Request(TensorsData input)
             {
                 if (input == null)
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "Given input is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "Given input is invalid");
 
                 IntPtr outputPtr = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.RequestQuery(_service.GetHandle(), input.GetHandle(), out outputPtr);
-                NNService.CheckException(ret, "Failed to request query");
+                MLServiceError ret = Interop.Service.RequestQuery(_service.GetHandle(), input.GetHandle(), out outputPtr);
+                MLService.CheckException(ret, "Failed to request query");
 
                 return TensorsData.CreateFromNativeHandle(outputPtr, IntPtr.Zero, true);
             }
@@ -230,10 +230,10 @@ namespace Tizen.MachineLearning.Service
 
             public Pipeline(string name)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
                 IntPtr handle = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.LaunchPipeline(name, out handle);
-                NNService.CheckException(ret, "Failed to create service pipeline instance");
+                MLServiceError ret = Interop.Service.LaunchPipeline(name, out handle);
+                MLService.CheckException(ret, "Failed to create service pipeline instance");
 
                 _service = new Service(handle);
             }
@@ -252,53 +252,53 @@ namespace Tizen.MachineLearning.Service
 
             static public void Set(string name, string desc)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 if (string.IsNullOrEmpty(desc))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property desc is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property desc is invalid");
 
-                NNServiceError ret = Interop.Service.SetPipeline(name, desc);
-                NNService.CheckException(ret, "Failed to create service pipeline");
+                MLServiceError ret = Interop.Service.SetPipeline(name, desc);
+                MLService.CheckException(ret, "Failed to create service pipeline");
             }
 
             static public string Get(string name)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 IntPtr value = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.GetPipeline(name, out value);
-                NNService.CheckException(ret, "Failed to get service pipeline");
+                MLServiceError ret = Interop.Service.GetPipeline(name, out value);
+                MLService.CheckException(ret, "Failed to get service pipeline");
 
                 return Interop.Util.IntPtrToString(value);
             }
 
             static public void Delete(string name)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
-                NNServiceError ret = Interop.Service.DeletePipeline(name);
-                NNService.CheckException(ret, "Failed to delete service pipeline");
+                MLServiceError ret = Interop.Service.DeletePipeline(name);
+                MLService.CheckException(ret, "Failed to delete service pipeline");
             }
 
             public PipelineState GetState()
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 int state = 0;
-                NNServiceError ret = Interop.Service.GetPipelineState(_service.GetHandle(), out state);
-                if (ret == NNServiceError.None && state == 0)
-                    ret = NNServiceError.InvalidOperation;
+                MLServiceError ret = Interop.Service.GetPipelineState(_service.GetHandle(), out state);
+                if (ret == MLServiceError.None && state == 0)
+                    ret = MLServiceError.InvalidOperation;
 
-                NNService.CheckException(ret, "Failed to get service pipeline state");
+                MLService.CheckException(ret, "Failed to get service pipeline state");
 
                 return (PipelineState) state;
             }
@@ -308,56 +308,56 @@ namespace Tizen.MachineLearning.Service
         {
             static public int Register(string name, string path, bool activate = false, string description = "")
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 if (string.IsNullOrEmpty(path))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property path is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property path is invalid");
 
                 int version;
-                NNServiceError ret = Interop.Service.RegisterModel(name, path, activate, description, out version);
-                NNService.CheckException(ret, "Failed to register model");
+                MLServiceError ret = Interop.Service.RegisterModel(name, path, activate, description, out version);
+                MLService.CheckException(ret, "Failed to register model");
 
                 return version;
             }
 
             static public void UpdateDescription(string name, int version, string description)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 if (string.IsNullOrEmpty(description))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property description is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property description is invalid");
 
-                NNServiceError ret = Interop.Service.UpdateModelDescription(name, version, description);
-                NNService.CheckException(ret, "Failed to update model description");
+                MLServiceError ret = Interop.Service.UpdateModelDescription(name, version, description);
+                MLService.CheckException(ret, "Failed to update model description");
             }
 
             static public void Activate(string name, int version, string description)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
-                NNServiceError ret = Interop.Service.ActivateModel(name, version);
-                NNService.CheckException(ret, "Failed to activate the given model");
+                MLServiceError ret = Interop.Service.ActivateModel(name, version);
+                MLService.CheckException(ret, "Failed to activate the given model");
             }
 
             static public MlInformation Get(string name, int version)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 IntPtr info = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.GetModel(name, version, out info);
-                NNService.CheckException(ret, "Failed to get the given model");
+                MLServiceError ret = Interop.Service.GetModel(name, version, out info);
+                MLService.CheckException(ret, "Failed to get the given model");
 
                 MlInformation result = new MlInformation(info);
                 return result;
@@ -365,14 +365,14 @@ namespace Tizen.MachineLearning.Service
 
             static public MlInformation GetActivated(string name)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 IntPtr info = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.GetActivatedModel(name, out info);
-                NNService.CheckException(ret, "Failed to get the given activated model");
+                MLServiceError ret = Interop.Service.GetActivatedModel(name, out info);
+                MLService.CheckException(ret, "Failed to get the given activated model");
 
                 MlInformation result = new MlInformation(info);
                 return result;
@@ -380,14 +380,14 @@ namespace Tizen.MachineLearning.Service
 
             static public MlInformationList GetAll(string name)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 IntPtr info = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.GetAllModel(name, out info);
-                NNService.CheckException(ret, "Failed to get the given models");
+                MLServiceError ret = Interop.Service.GetAllModel(name, out info);
+                MLService.CheckException(ret, "Failed to get the given models");
 
                 MlInformationList result = new MlInformationList(info);
                 return result;
@@ -395,13 +395,13 @@ namespace Tizen.MachineLearning.Service
 
             static public void Delete(string name, int version)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
-                NNServiceError ret = Interop.Service.DeleteModel(name, version);
-                NNService.CheckException(ret, "Failed to delete the given model");
+                MLServiceError ret = Interop.Service.DeleteModel(name, version);
+                MLService.CheckException(ret, "Failed to delete the given model");
             }
         }
 
@@ -409,39 +409,39 @@ namespace Tizen.MachineLearning.Service
         {
             static public void Add(string name, string path, string description="")
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 if (string.IsNullOrEmpty(path))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property path is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property path is invalid");
 
-                NNServiceError ret = Interop.Service.AddResource(name, path, description);
-                NNService.CheckException(ret, "Failed to add resource");
+                MLServiceError ret = Interop.Service.AddResource(name, path, description);
+                MLService.CheckException(ret, "Failed to add resource");
             }
 
             static public void Delete(string name)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
-                NNServiceError ret = Interop.Service.DeleteResource(name);
-                NNService.CheckException(ret, "Failed to delete resource");
+                MLServiceError ret = Interop.Service.DeleteResource(name);
+                MLService.CheckException(ret, "Failed to delete resource");
             }
 
             static public MlInformationList Get(string name)
             {
-                NNService.CheckNNServiceSupport();
+                MLService.CheckMLServiceSupport();
 
                 if (string.IsNullOrEmpty(name))
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The property name is invalid");
+                    throw MLServiceExceptionFactory.CreateException(MLServiceError.InvalidParameter, "The property name is invalid");
 
                 IntPtr infoList = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.GetResource(name, out infoList);
-                NNService.CheckException(ret, "Failed to get resource");
+                MLServiceError ret = Interop.Service.GetResource(name, out infoList);
+                MLService.CheckException(ret, "Failed to get resource");
 
                 return new MlInformationList(infoList);
             }

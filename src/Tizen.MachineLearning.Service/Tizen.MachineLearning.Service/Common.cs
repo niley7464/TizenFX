@@ -20,7 +20,7 @@ using Tizen.System;
 
 namespace Tizen.MachineLearning.Service
 {
-    internal enum NNServiceError
+    internal enum MLServiceError
     {
         None = Tizen.Internals.Errors.ErrorCode.None,
         InvalidParameter = Tizen.Internals.Errors.ErrorCode.InvalidParameter,
@@ -30,7 +30,7 @@ namespace Tizen.MachineLearning.Service
         InvalidOperation = Tizen.Internals.Errors.ErrorCode.InvalidOperation,
     }
 
-    internal static class NNService
+    internal static class MLService
     {
         internal const string TAG = "ML.Service";
 
@@ -38,16 +38,16 @@ namespace Tizen.MachineLearning.Service
 
         private static int _alreadyChecked = -1;    /* -1: not yet, 0: Not Support, 1: Support */
 
-        internal static void CheckException(NNServiceError error, string msg)
+        internal static void CheckException(MLServiceError error, string msg)
         {
-            if (error != NNServiceError.None)
+            if (error != MLServiceError.None)
             {
-                Log.Error(NNService.TAG, msg + ": " + error.ToString());
-                throw NNServiceExceptionFactory.CreateException(error, msg);
+                Log.Error(MLService.TAG, msg + ": " + error.ToString());
+                throw MLServiceExceptionFactory.CreateException(error, msg);
             }
         }
 
-        internal static void CheckNNServiceSupport()
+        internal static void CheckMLServiceSupport()
         {
             if (_alreadyChecked == 1)
                 return;
@@ -55,8 +55,8 @@ namespace Tizen.MachineLearning.Service
             string msg = "Machine Learning Service Feature is not supported.";
             if (_alreadyChecked == 0)
             {
-                Log.Error(NNService.TAG, msg);
-                throw NNServiceExceptionFactory.CreateException(NNServiceError.NotSupported, msg);
+                Log.Error(MLService.TAG, msg);
+                throw MLServiceExceptionFactory.CreateException(MLServiceError.NotSupported, msg);
             }
 
             /* Feature Key check */
@@ -74,23 +74,23 @@ namespace Tizen.MachineLearning.Service
         }
     }
 
-    internal class NNServiceExceptionFactory
+    internal class MLServiceExceptionFactory
     {
-        internal static Exception CreateException(NNServiceError err, string msg)
+        internal static Exception CreateException(MLServiceError err, string msg)
         {
             Exception exp;
 
             switch (err)
             {
-                case NNServiceError.InvalidParameter:
+                case MLServiceError.InvalidParameter:
                     exp = new ArgumentException(msg);
                     break;
 
-                case NNServiceError.NotSupported:
+                case MLServiceError.NotSupported:
                     exp = new NotSupportedException(msg);
                     break;
 
-                case NNServiceError.PermissionDenied:
+                case MLServiceError.PermissionDenied:
                     exp = new UnauthorizedAccessException(msg);
                     break;
 
