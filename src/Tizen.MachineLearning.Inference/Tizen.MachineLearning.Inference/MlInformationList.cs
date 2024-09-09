@@ -22,8 +22,16 @@ namespace Tizen.MachineLearning.Inference
     {
         private IntPtr _handle = IntPtr.Zero;
 
+        public MlInformationList() {
+            NNStreamer.CheckNNStreamerSupport();
+            NNStreamerError ret = Interop.Util.CreateInformationList(out _handle);
+        }
+
         public MlInformationList(IntPtr handle) {
             NNStreamer.CheckNNStreamerSupport();
+            if (handle == IntPtr.Zero)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The information list handle is null");
+
             _handle = handle;
         }
 
@@ -46,6 +54,20 @@ namespace Tizen.MachineLearning.Inference
             return new MlInformation(value);
         }
 
+        public IntPtr GetInformationHandle(int index)
+        {
+            int length = GetLength();
+
+            if (index >= length)
+                throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property index is out of bound");
+
+            IntPtr value = IntPtr.Zero;
+
+            NNStreamerError ret = Interop.Util.GetInformation(_handle, index, out value);
+            NNStreamer.CheckException(ret, "Failed to get information from list");
+            return value;
+        }
+
         public int GetLength()
         {
             int value = 0;
@@ -53,6 +75,12 @@ namespace Tizen.MachineLearning.Inference
             NNStreamerError ret = Interop.Util.GetInformationListLength(_handle, out value);
             NNStreamer.CheckException(ret, "Failed to get the length of information list");
             return value;
+        }
+
+        public void AddInformation(MlInformation info)
+        {
+            NNStreamerError ret = Interop.Util.AddInformation(_handle, info.GetHandle());
+            NNStreamer.CheckException(ret, "Failed to add information to information list");
         }
     }
 }

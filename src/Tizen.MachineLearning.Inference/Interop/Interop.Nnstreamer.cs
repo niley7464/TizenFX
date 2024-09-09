@@ -321,6 +321,14 @@ internal static partial class Interop
         [DllImport(Libraries.MlCommon, EntryPoint = "ml_information_get", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError GetInformationValue(IntPtr info, string key, out IntPtr value);
 
+        /* int _ml_information_list_create (ml_information_list_h *list); */
+        [DllImport(Libraries.MlCommon, EntryPoint = "_ml_information_list_create", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError CreateInformationList(out IntPtr info);
+
+        /* int _ml_information_list_add (ml_information_list_h list, ml_information_h info); */
+        [DllImport(Libraries.MlCommon, EntryPoint = "_ml_information_list_add", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NNStreamerError AddInformation(IntPtr info_list, IntPtr info);
+
         /* int ml_information_list_destroy (ml_information_list_h ml_info_list); */
         [DllImport(Libraries.MlCommon, EntryPoint = "ml_information_list_destroy", CallingConvention = CallingConvention.Cdecl)]
         internal static extern NNStreamerError DestroyInformationList(IntPtr info_list);

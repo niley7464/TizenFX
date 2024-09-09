@@ -194,13 +194,18 @@ namespace Tizen.MachineLearning.Service
         {
             private Service _service;
 
-            public Query(MlInformation information)
+            public Query(MlInformationList infoList, int index)
             {
                 NNService.CheckNNServiceSupport();
-                if (information == null)
-                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The information is invalid");
+                if (infoList == null)
+                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The information list is invalid");
+
+                IntPtr infoHandle = infoList.GetInformationHandle(index);
+                if (infoHandle == null)
+                    throw NNServiceExceptionFactory.CreateException(NNServiceError.InvalidParameter, "The information handle is invalid");
+
                 IntPtr handle = IntPtr.Zero;
-                NNServiceError ret = Interop.Service.CreateQuery(information.GetHandle(), out handle);
+                NNServiceError ret = Interop.Service.CreateQuery(infoHandle, out handle);
                 NNService.CheckException(ret, "Failed to create service query instance");
 
                 _service = new Service(handle);
