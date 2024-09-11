@@ -51,7 +51,7 @@ namespace Tizen.MachineLearning.Inference
         }
 
         /// <summary>
-        /// Creates a MlInformation instance from Native handle.
+        /// Creates a MlInformation instance from native handle.
         /// </summary>
         /// <param name="handle">Native handle of MlInformation.</param>
         /// <param name="type">Types of MlInformation.</param>
@@ -181,7 +181,7 @@ namespace Tizen.MachineLearning.Inference
         /// <exception cref="ArgumentException">Thrown when the method failed due to an invalid parameter.</exception>
         /// <exception cref="NotSupportedException">Thrown when the feature is not supported.</exception>
         /// <since_tizen> 13 </since_tizen>
-        public void SetNumber(string key, int value)
+        public void SetInteger(string key, int value)
         {
             if (string.IsNullOrEmpty(key))
                 throw NNStreamerExceptionFactory.CreateException(NNStreamerError.InvalidParameter, "The property key is invalid");
@@ -195,11 +195,11 @@ namespace Tizen.MachineLearning.Inference
                     break;
                 case InfoType.Information:
                     ret = NNStreamerError.NotSupported;
-                    Log.Error(NNStreamer.TAG, "InfoType Iniformation does not support set value");
+                    Log.Error(NNStreamer.TAG, "InfoType Information does not support set value");
                     break;
             }
 
-            NNStreamer.CheckException(ret, "Failed to set string value");
+            NNStreamer.CheckException(ret, "Failed to set integer value");
         }
 
         private IntPtr GetInformationHandle(string key)
@@ -228,7 +228,7 @@ namespace Tizen.MachineLearning.Inference
         /// <summary>
         /// Gets a string value of key in MlInformation instance.
         /// </summary>
-        /// <param name="key">The key to be set.</param>
+        /// <param name="key">The key to get the corresponding value.</param>
         /// <returns>The string value of the key.</returns>
         /// <feature>http://tizen.org/feature/machine_learning.inference</feature>
         /// <exception cref="ArgumentException">Thrown when the method failed due to an invalid parameter.</exception>
@@ -243,14 +243,14 @@ namespace Tizen.MachineLearning.Inference
         }
 
         /// <summary>
-        /// Gets a int value of key in MlInformation instance.
+        /// Gets an int value of key in MlInformation instance.
         /// </summary>
-        /// <param name="key">The key to be set.</param>
-        /// <returns>The string value of the key.</returns>
+        /// <param name="key">The key to get the corresponding value.</param>
+        /// <returns>The integer value of the key.</returns>
         /// <feature>http://tizen.org/feature/machine_learning.inference</feature>
         /// <exception cref="ArgumentException">Thrown when the method failed due to an invalid parameter.</exception>
         /// <since_tizen> 13 </since_tizen>
-        public int GetNumber(string key)
+        public int GetInteger(string key)
         {
             IntPtr value = GetInformationHandle(key);
             if (value == IntPtr.Zero)
